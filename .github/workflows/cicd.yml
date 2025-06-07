@@ -25,5 +25,5 @@ jobs:
           application_name: 'nodejs-app'
           environment_name: 'nodejs-app-env'
           version_label: ${{ github.sha }}
-          region: us-east-1
+          region: eu-north-1
           deployment_package: nodejs-app-build.zip
