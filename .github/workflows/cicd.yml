@@ -5,19 +5,25 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: [ ubuntu-latest ]
+    runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Source
+      - name: 🧾 Checkout Source
         uses: actions/checkout@v4
-      - name: Setup Node
+
+      - name: ⚙️ Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install Dependencies
+
+      - name: 📦 Install Dependencies
         run: npm install
-      - name: Genrate Deployment Package
-        run: zip -r nodejs-app-build.zip .
-      - name: Deploy to EB
+
+      - name: 📁 Generate Deployment Package
+        run: |
+          zip -r nodejs-app-build.zip . -x ".git/*" "node_modules/*" ".github/*"
+
+      - name: 🚀 Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
