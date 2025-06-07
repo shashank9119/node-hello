@@ -5,7 +5,8 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: [ ubuntu-latest ]
+    runs-on: ubuntu-latest
+
     steps:
       - name: 🛒 Checkout Source
         uses: actions/checkout@v4
@@ -21,13 +22,13 @@ jobs:
       - name: 📁 Generate Deployment Package
         run: zip -r nodejs-app-build.zip . -x "*.git*" "node_modules/*"
 
-      - name: 🧪 Upload ZIP as Artifact
+      - name: 🧪 Upload ZIP as Artifact (Optional)
         uses: actions/upload-artifact@v4
         with:
           name: deploy-package
           path: nodejs-app-build.zip
 
-      - name: 🚀 Deploy to EB
+      - name: 🚀 Deploy to AWS Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
