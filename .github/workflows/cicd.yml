@@ -4,14 +4,32 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Branch to deploy'
+        description: 'Enter the branch name to deploy'
         required: true
         default: 'main'
 
 jobs:
+  validate-branch:
+    name: Validate Branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Validate branch exists
+        run: |
+          git fetch origin
+          if ! git ls-remote --exit-code --heads origin ${{ github.event.inputs.branch }}; then
+            echo "Branch '${{ github.event.inputs.branch }}' does not exist!"
+            exit 1
+          fi
+
   build:
     name: Checkout & Build
     runs-on: ubuntu-latest
+    needs: validate-branch
 
     steps:
       - name: Checkout Code
@@ -35,10 +53,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: production  # Use a single environment name to trigger approval
+      name: production
     steps:
       - name: Awaiting Manual Approval
-        run: echo "Waiting for approval via GitHub UI..."
+        run: echo "Waiting for manual approval via GitHub UI..."
 
   deploy:
     name: Deploy to AWS Elastic Beanstalk
@@ -55,7 +73,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # update as needed
+          aws-region: us-east-1
 
       - name: Zip Application
         run: zip -r app.zip .
