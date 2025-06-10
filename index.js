@@ -2,12 +2,12 @@ const http = require('http');
 
 // Jest's beforeAll and afterAll hooks to manage the server lifecycle
 let server;
-const port = 3001; // Use a different port for testing to avoid conflicts
+const port = 3001; // Use a different port for testing to avoid conflicts with your main app
 
 beforeAll(done => {
   // Start the server for testing
-  // Make sure your original index.js exports the server creation or is runnable independently
-  // For this example, we'll mimic the server creation to test its response
+  // We're creating a simple server here for testing purposes.
+  // In a more complex app, you might want to refactor index.js to export the server.
   server = http.createServer((req, res) => {
     res.statusCode = 200;
     const msg = 'Hello shashank chauhan!\n';
@@ -28,7 +28,6 @@ afterAll(done => {
   });
 });
 
-
 // Test case
 test('should respond with "Hello shashank chauhan!"', (done) => {
   http.get(`http://localhost:${port}/`, (res) => {
@@ -42,6 +41,6 @@ test('should respond with "Hello shashank chauhan!"', (done) => {
       done(); // Signal Jest that this asynchronous test is complete
     });
   }).on('error', (err) => {
-    done(err); // Pass error to Jest if request fails
+    done(err); // Pass error to Jest if the request fails
   });
 });
