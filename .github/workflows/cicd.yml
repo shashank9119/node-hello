@@ -1,4 +1,4 @@
-name: Simple CI/CD - Build, Test & Deploy
+name: CI/CD - Build, Test & Deploy to EB (QA)
 
 on:
   push:
@@ -17,12 +17,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'  # ✅ Use consistent version
+          node-version: '20'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build project
+      - name: Build the project
         run: npm run build
 
   test:
@@ -37,7 +37,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'  # ✅ Match version
+          node-version: '20'
 
       - name: Install dependencies
         run: npm ci
@@ -46,7 +46,7 @@ jobs:
         run: npm test
 
   deploy:
-    name: 🚀 Deploy to EB (QA)
+    name: 🚀 Deploy to Elastic Beanstalk (QA)
     runs-on: ubuntu-latest
     needs: test
     environment: qa
@@ -55,10 +55,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Zip project
-        run: zip -r deploy.zip . -x '*.git*' 'node_modules/*' '*.github*'
+      - name: Create deployment zip
+        run: zip -r deploy.zip . -x '*.git*' 'node_modules/*' '.github/*'
 
-      - name: Deploy to Elastic Beanstalk
+      - name: Deploy to AWS Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v22
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
