@@ -3,7 +3,7 @@ name: Deploy to Elastic Beanstalk (QA)
 on:
   push:
     branches:
-      - qa   # Trigger this workflow only when 'qa' branch is pushed
+      - master   # Trigger this workflow only when 'qa' branch is pushed
 
 jobs:
   deploy:
