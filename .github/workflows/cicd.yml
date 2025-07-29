@@ -28,4 +28,4 @@ jobs:
           region: ${{ vars.AWS_REGION }}
           version_label: deploy-${{ github.run_id }}-${{ github.run_number }}
           deployment_package: deploy.zip
-          s3_bucket: ${{ vars.S3_BUCKET }} # Optional if you want to use a custom bucket
+          existing_bucket_name: ${{ vars.S3_BUCKET }} # Optional if you want to use a custom bucket
