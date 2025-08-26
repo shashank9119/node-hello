@@ -1,0 +1,58 @@
+name: Build & Upload to S3
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_branch:
+        description: 'Branch to deploy'
+        required: true
+        default: 'main'
+      target_env:
+        description: 'Target environment (qa, staging, prod)'
+        required: true
+        default: 'qa'
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    env:
+      S3_BUCKET: ${{ env.EXISTING_BUCKET_NAME }}
+      AWS_REGION: ${{ env.AWS_REGION }}
+    steps:
+      # Step 1: Checkout Code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.deploy_branch }}
+
+      # Step 2: Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # Step 3: Install Dependencies
+      - name: Install Dependencies
+        run: npm ci
+
+      # Step 4: Build Project
+      - name: Build Project
+        run: npm run build
+
+      # Step 5: Configure AWS Credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Step 6: Zip Build Folder
+      - name: Zip Build Folder
+        run: zip -r deploy.zip build
+
+      # Step 7: Upload to S3
+      - name: Upload to S3
+        run: |
+          aws s3 cp deploy.zip s3://${EXISTING_BUCKET_NAME}/deploy-${{ github.run_number }}-${{ github.event.inputs.target_env }}.zip
